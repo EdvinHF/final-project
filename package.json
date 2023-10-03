@@ -1,0 +1,19 @@
+{
+  "name": "handlebars-example",
+  "version": "1.0.0",
+  "description": "Code for handlebars MVC (Model-View-Controller)",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "handlebars in Express."
+  ],
+  "author": "JL",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
+    "sqlite3": "^5.1.6"
+  }
+}

@@ -1,0 +1,16 @@
+<div id="main">
+  <div>
+    <h1>List of all persons</h1>
+    <div class="repeat">
+      <div class="bakery-goods">
+        <a class="product-name" href="/new-product">add</a>
+      </div>
+      {{#each listHumans}}
+        <div class="bakery-goods">
+          <a class="product-name" href="/humans/{{id}}">{{id}}: {{name}}</a>
+          <img class="product-image" src="/img/{{name}}.jpg" />
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</div>

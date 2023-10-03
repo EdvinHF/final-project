@@ -1,0 +1,45 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  box-sizing: content-box;
+}
+
+#main {
+  width: 90%;
+  margin: 0 auto;
+  margin-bottom: 96px;
+  margin-top: 32px;
+  box-sizing: content-box;
+  /*border: 3px solid gray;*/
+}
+#menu {
+  display: flex;
+  flex-direction: row;
+}
+
+a {
+  color: black;
+}
+a:hover {
+  color: rgb(136, 136, 136);
+  text-decoration: none;
+}
+.repeat {
+  display: grid;
+  grid-area: pmain;
+  grid-template-columns: repeat(auto-fit, 400px);
+  gap: 3rem;
+  justify-content: center;
+}
+.bakery-goods {
+  height: 400px;
+  background-color: rgb(228, 141, 27);
+}
+.product-image {
+  width: 400px;
+}
+.description-new {
+  width: 800px;
+  height: 500px;
+}

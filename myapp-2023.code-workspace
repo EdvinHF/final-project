@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../Downloads/handlebars-mvc/handlebars-mvc/views"
+		},
+		{
+			"path": "../../../Downloads/handlebars-mvc/handlebars-mvc/public"
+		}
+	],
+	"settings": {}
+}
