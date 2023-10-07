@@ -1,0 +1,63 @@
+<div id="main">
+  <div>
+    {{#if isLoggedIn}}
+      {{#if isAdmin}}
+        <form action="/humans/update/{{project.pid}}" method="post">
+          <fieldset>
+            <label for="proname">Product name:</label>
+            <input
+              type="text"
+              name="proname"
+              id="proname"
+              value="{{project.pname}}"
+              required="required"
+            />
+            <br />
+            <label for="proyear">Product year:</label>
+            <input
+              type="number"
+              name="proyear"
+              id="proyear"
+              placeholder="6969"
+              value="{{project.pyear}}"
+              required="required"
+            />
+            <br />
+            <label for="prodesc">Product description:</label>
+            <textarea
+              name="prodesc"
+              id="prodesc"
+              cols="30"
+              rows="10"
+              required="required"
+            >{{project.pdesc}}</textarea>
+            <br />
+            <label for="protype">Product type:</label>
+            <select name="protype" id="protype" required="required">
+                <option value="Research"{{#if (theTypeR project.ptype)}} selected="selected"{{/if}}>Research</option>
+                <option value="Teaching"{{#if (theTypeT project.ptype)}} selected="selected"{{/if}}>Teaching</option>
+                <option value="Other"{{#if (theTypeO project.ptype)}} selected="selected"{{/if}}>Other</option>
+
+            </select>
+            <br />
+            <label for="proimg">Project image URL:</label>
+            <input
+              type="text"
+              name="proimg"
+              id="proimg"
+              placeholder="/img/"
+              value="{{project.pimgURL}}"
+              required="required"
+            />
+            <br />
+          </fieldset>
+          <input type="submit" value="Submit changes" />
+        </form>
+      {{else}}
+        <p>You can't do this.</p>
+      {{/if}}
+    {{else}}
+      <p>No way, José.</p>
+    {{/if}}
+  </div>
+</div>

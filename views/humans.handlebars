@@ -1,16 +1,31 @@
 <div id="main">
   <div>
+    {{#if hasDatabaseError}}
+    <div>Error</div>
+    {{else}}
     <h1>List of all persons</h1>
     <div class="repeat">
       <div class="bakery-goods">
-        <a class="product-name" href="/new-product">add</a>
+      
+        {{#if isAdmin}}
+         <a href="/humans/new">add</a>
+        {{/if}}
+      
       </div>
-      {{#each listHumans}}
-        <div class="bakery-goods">
-          <a class="product-name" href="/humans/{{id}}">{{id}}: {{name}}</a>
-          <img class="product-image" src="/img/{{name}}.jpg" />
-        </div>
-      {{/each}}
+        {{#each projects}}
+          <div class="bakery-goods">
+            <a class="product-name" href="/humans/{{pid}}">{{pid}}:
+              {{pname}}</a>
+            
+            {{#if ../isAdmin}}
+            <div>
+              <a href="/humans/update/{{pid}}">Edit</a> - <a href="/humans/delete/{{pid}}">Delete</a>
+            </div>
+            {{/if}}
+            <img class="product-image" src="{{pimgURL}}" />
+          </div>
+        {{/each}}
+      {{/if}}
     </div>
   </div>
 </div>

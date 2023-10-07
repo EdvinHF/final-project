@@ -1,0 +1,59 @@
+<div id="main">
+  <div>
+    {{#if isLoggedIn}}
+      {{#if isAdmin}}
+        <form action="/humans/new" method="post">
+          <fieldset>
+            <label for="proname">Product name:</label>
+            <input
+              type="text"
+              name="proname"
+              id="proname"
+              required="required"
+            />
+            <br />
+            <label for="proyear">Product year:</label>
+            <input
+              type="number"
+              name="proyear"
+              id="proyear"
+              placeholder="6969"
+              required="required"
+            />
+            <br />
+            <label for="prodesc">Product description:</label>
+            <textarea
+              name="prodesc"
+              id="prodesc"
+              cols="30"
+              rows="10"
+              required="required"
+            ></textarea>
+            <br />
+            <label for="protype">Product type:</label>
+            <select name="protype" id="protype" required="required">
+              <option value="Research">Research</option>
+              <option value="Education">Education</option>
+              <option value="Other">Other</option>
+            </select>
+            <br />
+            <label for="proimg">Project image URL:</label>
+            <input
+              type="text"
+              name="proimg"
+              id="proimg"
+              placeholder="/img/"
+              required="required"
+            />
+            <br />
+          </fieldset>
+          <input type="submit" value="Add project" />
+        </form>
+      {{else}}
+        <p>You can't do this.</p>
+      {{/if}}
+    {{else}}
+      <p>No way, José.</p>
+    {{/if}}
+  </div>
+</div>

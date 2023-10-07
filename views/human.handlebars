@@ -1,10 +1,13 @@
 <div id="main">
-  <div>
-    <h1>Information</h1>
-    <div>
-      {{name}}
-      has ID
-      {{id}}.
-    </div>
-  </div>
+  {{#if hasDatabaseError}}
+    <div>Error</div>
+  {{else}}
+
+    <h1>{{project.pid}}</h1>
+    <h2>{{project.pname}}</h2>
+    <p>{{project.pyear}}</p>
+    <p>{{project.pdesc}}</p>
+    <p>{{project.ptype}}</p>
+    <img src="{{project.pimgURL}}" alt="{{project.pname}}" />
+  {{/if}}
 </div>
