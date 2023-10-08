@@ -1,11 +1,37 @@
 <header id="header">
-  <nav id="menu">
-    <h2><a href="/"> Home </a></h2>
-    <h2><a href="/humans"> Humans </a></h2>
+  <nav id="menu" class="navbar">
+    <section class="navbar">
+      <a class="column col-1 col-auto" class="menu-item" href="/">
+        <img class="menu-img" src="/img/firley-logo-white.png" alt="home" />
+      </a>
+      <a class="menu-link" href="/humans"><p
+          class="menu-item"
+          class="column col-2 col-auto"
+        >
+          Shop
+        </p></a>
+      <a class="menu-link" href="/humans"><p
+          class="menu-item"
+          class="column col-3 col-auto"
+        >
+          About</p></a>
+      <a class="menu-link" href="/humans">
+        <p class="menu-item" class="column col-4 col-auto">
+          Contact
+        </p></a>
+    </section>
     {{#if isLoggedIn}}
-      <h2><a href="/logout">Log out</a></h2>
+      <section class="navbar-section">
+        <a class="menu-link" href="/logout">
+          <p class="menu-item" class="column col-5 col-auto">Log out</p>
+        </a>
+      </section>
     {{else}}
-      <h2><a href="/login">Log in</a></h2>
+      <section class="navbar-section">
+        <a class="menu-link" href="/login">
+          <p class="menu-item" class="column col-5 col-auto">Log in</p>
+        </a>
+      </section>
     {{/if}}
 
   </nav>

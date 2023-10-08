@@ -13,16 +13,18 @@
       
       </div>
         {{#each projects}}
-          <div class="bakery-goods">
-            <a class="product-name" href="/humans/{{pid}}">{{pid}}:
-              {{pname}}</a>
-            
+          <div class="bakery-goods"><a class="product-name" href="/humans/{{pid}}">
+            <img class="product-image" src="{{pimgURL}}" />
+            </a>
+            <div class="under-img">
+            <a class="product-name" href="/humans/{{pid}}">{{pname}}</a>
             {{#if ../isAdmin}}
             <div>
-              <a href="/humans/update/{{pid}}">Edit</a> - <a href="/humans/delete/{{pid}}">Delete</a>
+              <a href="/humans/update/{{pid}}"><img src="/img/Edit.png" alt=""></a> - <a href="/humans/delete/{{pid}}"><img src="/img/close_ring.png" alt=""></a>
+            </div>
             </div>
             {{/if}}
-            <img class="product-image" src="{{pimgURL}}" />
+            
           </div>
         {{/each}}
       {{/if}}

@@ -1,15 +1,68 @@
-<form action="/signup" method="POST">
-  <input
-    type="text"
-    name="username"
-    placeholder="Username"
-    required="required"
-  />
-  <input
-    type="password"
-    name="password"
-    placeholder="Password"
-    required="required"
-  />
-  <input type="submit" value="signup" />
-</form>
+<div class="main">
+  <div class="form-container">
+    <h1 class="login-text">Create Account</h1>
+    <form action="/signup" method="POST" class="login-form">
+      <section class="required">
+        <input
+          type="text"
+          name="Name"
+          placeholder="Name"
+          required="required"
+          class="login-input"
+        />
+        <p>*</p>
+      </section>
+      <section class="required">
+        <input
+          type="Last Name"
+          name="Last Name"
+          placeholder="Last Name"
+          required="required"
+          class="login-input"
+        />
+        <p>*</p>
+      </section>
+      <section class="required">
+        <input
+          type="Email"
+          name="Email"
+          placeholder="Email"
+          required="required"
+          class="login-input"
+        />
+        <p>*</p>
+      </section>
+      <section class="required">
+        <input
+          type="Username"
+          name="Username"
+          placeholder="Username"
+          required="required"
+          class="login-input"
+        />
+        <p>*</p>
+      </section>
+      <section class="required">
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required="required"
+          class="login-input"
+        />
+        <p>*</p>
+      </section>
+      <section class="required">
+        <input
+          type="password"
+          name="password-same"
+          placeholder="Password"
+          required="required"
+          class="login-input"
+        />
+        <p>*</p>
+      </section>
+      <input class="submitbutton" type="submit" value="Sign Up" />
+    </form>
+  </div>
+</div>
