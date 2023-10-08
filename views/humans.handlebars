@@ -1,33 +1,38 @@
-<div id="main">
-  <div>
+<div id="main" class="product-main">
+  
     {{#if hasDatabaseError}}
     <div>Error</div>
     {{else}}
-    <h1>List of all persons</h1>
+    <h1 class="product-headline">All Products</h1>
     <div class="repeat">
-      <div class="bakery-goods">
+      
       
         {{#if isAdmin}}
-         <a href="/humans/new">add</a>
+        <div class="bakery-goods" id="add-product">
+         <a href="/humans/new"><img class="add-img"src="/img/Add_light.svg" alt="add"></a>
+          </div>
         {{/if}}
       
-      </div>
+     
         {{#each projects}}
           <div class="bakery-goods"><a class="product-name" href="/humans/{{pid}}">
             <img class="product-image" src="{{pimgURL}}" />
             </a>
             <div class="under-img">
+              <div class="product-information">
             <a class="product-name" href="/humans/{{pid}}">{{pname}}</a>
+            </div>
             {{#if ../isAdmin}}
-            <div>
-              <a href="/humans/update/{{pid}}"><img src="/img/Edit.png" alt=""></a> - <a href="/humans/delete/{{pid}}"><img src="/img/close_ring.png" alt=""></a>
+            <div class="product-remove-edit">
+              <a href="/humans/update/{{pid}}"><img src="/img/Edit.png" alt=""></a><a href="/humans/delete/{{pid}}"><img src="/img/close_ring.png" alt=""></a>
             </div>
+             {{/if}}
             </div>
-            {{/if}}
+           
             
           </div>
         {{/each}}
       {{/if}}
     </div>
-  </div>
+  
 </div>
