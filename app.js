@@ -6,6 +6,7 @@ const port = 8080;
 const app = express();
 const cookieParser = require("cookie-parser");
 const connectSqlite3 = require("connect-sqlite3");
+const bcrypt = require("bcrypt");
 
 const sqlite3 = require("sqlite3");
 const db = new sqlite3.Database("project-jl.db");
@@ -257,23 +258,59 @@ app.get("/login", (req, res) => {
   res.render("login.handlebars", model);
 });
 app.post("/login", (req, res) => {
-  const un = req.body.un;
-  const pw = req.body.pw;
+  const { username, password } = req.body;
 
-  if (un === "ebrin" && pw === "123") {
-    console.log("hi ebrin");
-    req.session.isAdmin = true;
-    req.session.isLoggedIn = true;
-    req.session.name = "edvin höglin forsberg";
-    res.redirect("/");
-  } else {
-    req.session.isAdmin = false;
-    req.session.isLoggedIn = false;
-    req.session.name = "";
-    console.log("poopie");
-    res.redirect("/login");
-  }
+  db.get("SELECT * FROM users WHERE uun = ?", [username], (err, oneUser) => {
+    if (err) {
+      res.status(500).send({ error: "Server error" });
+    } else if (!oneUser) {
+      res.status(401).send({ error: "User not found" });
+    } else {
+      const result = bcrypt.compareSync(password, oneUser.upw);
+      if (result) {
+        if (oneUser.urole == "admin") {
+          req.session.isAdmin = true;
+        } else {
+          req.session.isAdmin = false;
+        }
+        req.session.isLoggedIn = true;
+        req.session.name = oneUser.name;
+        res.redirect("/");
+      } else {
+        res.status(401).send({ error: "Wrong password" });
+      }
+    }
+  });
 });
+
+app.get("/signup", (req, res) => {
+  const model = {
+    isLoggedIn: req.session.isLoggedIn,
+    name: req.session.name,
+    isAdmin: req.session.isAdmin,
+    title: "sign up",
+  };
+  res.render("signup.handlebars", model);
+});
+
+app.post("/signup", (req, res) => {
+  const { username, password } = req.body;
+
+  const hash = bcrypt.hashSync(password, 10);
+
+  db.run(
+    "INSERT INTO users (uname, urole, uun, upw) VALUES (?, ?, ?, ?)",
+    [username, "admin", username, hash],
+    (err) => {
+      if (err) {
+        res.status(500).send({ error: "Server error" });
+      } else {
+        res.redirect("/login");
+      }
+    }
+  );
+});
+
 app.get("/logout", (req, res) => {
   req.session.destroy((error) => {
     console.log("error destroying session", error);
@@ -282,7 +319,7 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 db.run(
-  "CREATE TABLE projects (pid INTEGER PRIMARY KEY AUTOINCREMENT,, pname TEXT NOT NULL, pyear INTEGER NOT NULL, pdesc TEXT NOT NULL, ptype TEXT NOT NULL, pimgURL TEXT NOT NULL)",
+  "CREATE TABLE projects (pid INTEGER PRIMARY KEY AUTOINCREMENT, pname TEXT NOT NULL, pyear INTEGER NOT NULL, pdesc TEXT NOT NULL, ptype TEXT NOT NULL, pimgURL TEXT NOT NULL)",
   (error) => {
     if (error) {
       // tests error: display error
@@ -307,38 +344,6 @@ db.run(
           desc: "The project makes a 3D model of the analysis of the body of a person and displays the detected health problems. It is useful for doctors to view in 3D their patients and the evolution of a disease.",
           year: 2012,
           url: "/img/kanelbulle.jpg",
-        },
-        {
-          id: "3",
-          name: "Multiple questions system",
-          type: "teaching",
-          desc: "During the lockdowns in France, this project was useful to test the students online with a Quizz system.",
-          year: 2021,
-          url: "/img/korv.jpg",
-        },
-        {
-          id: "4",
-          name: "Image comparison with the Local Dissmilarity Map",
-          desc: "The project is about finding and quantifying the differences between two images of the same size. The applications were numerous: satallite imaging, medical imaging,...",
-          year: 2020,
-          type: "research",
-          url: "/img/chokladboll.jpg",
-        },
-        {
-          id: "5",
-          name: "Management system for students' internships",
-          desc: "This project was about the creation of a database to manage the students' internships.",
-          year: 2012,
-          type: "teaching",
-          url: "/img/katt.png",
-        },
-        {
-          id: "6",
-          name: "Management system for students' internships",
-          desc: "This project was about the creation of a database to manage the students' internships.",
-          year: 2012,
-          type: "teaching",
-          url: "/img/tårta.jpg",
         },
       ];
       // inserts projects
@@ -367,91 +372,7 @@ db.run(
 );
 
 db.run(
-  "CREATE TABLE skills (sid INTEGER PRIMARY KEY, sname TEXT NOT NULL, sdesc TEXT NOT NULL, stype TEXT NOT NULL)",
-  (error) => {
-    if (error) {
-      // tests error: display error
-      console.log("ERROR: ", error);
-    } else {
-      // tests error: no error, the table has been created
-      console.log("---> Table skills created!");
-      const skills = [
-        {
-          id: "1",
-          name: "PHP",
-          type: "Programming language",
-          desc: "Programming with PHP on the server side.",
-        },
-        {
-          id: "2",
-          name: "Python",
-          type: "Programming language",
-          desc: "Programming with Python.",
-        },
-        {
-          id: "3",
-          name: "Java",
-          type: "Programming language",
-          desc: "Programming with Java.",
-        },
-        {
-          id: "4",
-          name: "ImageJ",
-          type: "Framework",
-          desc: "Java Framework for Image Processing.",
-        },
-        {
-          id: "5",
-          name: "Javascript",
-          type: "Programming language",
-          desc: "Programming with Javascript on the client side.",
-        },
-        {
-          id: "6",
-          name: "Node",
-          type: "Programming language",
-          desc: "Programming with Javascript on the server side.",
-        },
-        {
-          id: "7",
-          name: "Express",
-          type: "Framework",
-          desc: "A framework for programming Javascript on the server side.",
-        },
-        {
-          id: "8",
-          name: "Scikit-image",
-          type: "Library",
-          desc: "A library for Image Processing with Python.",
-        },
-        {
-          id: "9",
-          name: "OpenCV",
-          type: "Library",
-          desc: "A library for Image Processing with Python.",
-        },
-      ];
-
-      // inserts skills
-      skills.forEach((oneSkill) => {
-        db.run(
-          "INSERT INTO skills (sid, sname, sdesc, stype) VALUES (?, ?, ?, ?)",
-          [oneSkill.id, oneSkill.name, oneSkill.desc, oneSkill.type],
-          (error) => {
-            if (error) {
-              console.log("ERROR: ", error);
-            } else {
-              console.log("Line added into the skills table!");
-            }
-          }
-        );
-      });
-    }
-  }
-);
-
-db.run(
-  "CREATE TABLE users (uid INTEGER PRIMARY KEY AUTOINCREMENT, uname TEXT NOT NULL, urole TEXT NOT NULL, un TEXT NOT NULL, pw TEXT NOT NULL)",
+  "CREATE TABLE users (uid INTEGER PRIMARY KEY, uname TEXT NOT NULL, urole TEXT NOT NULL, uun TEXT NOT NULL, upw TEXT NOT NULL)",
   (error) => {
     if (error) {
       // tests error: display error
@@ -469,54 +390,15 @@ db.run(
         },
       ];
       // inserts projects
-      projects.forEach((oneUser) => {
+      users.forEach((oneUser) => {
         db.run(
-          "INSERT INTO users (pid, pname, urole, un, pw) VALUES (?, ?, ?, ?)",
+          "INSERT INTO users (uid, uname, urole, uun, upw) VALUES (?, ?, ?, ?, ?)",
           [oneUser.id, oneUser.name, oneUser.role, oneUser.un, oneUser.pw],
           (error) => {
             if (error) {
               console.log("ERROR: ", error);
             } else {
-              console.log("Line added into the projects table!");
-            }
-          }
-        );
-      });
-    }
-  }
-);
-
-db.run(
-  "CREATE TABLE projectsSkills (psid INTEGER PRIMARY KEY, pid INTEGER, sid INTEGER, FOREIGN KEY (pid) REFERENCES projects (pid), FOREIGN KEY (sid) REFERENCES skills (sid))",
-  (error) => {
-    if (error) {
-      // tests error: display error
-      console.log("ERROR: ", error);
-    } else {
-      // tests error: no error, the table has been created
-      console.log("---> Table projectsSkills created!");
-      const projectsSkills = [
-        { id: "1", pid: "1", sid: "2" },
-        { id: "2", pid: "1", sid: "8" },
-        { id: "3", pid: "1", sid: "9" },
-        { id: "4", pid: "2", sid: "3" },
-        { id: "5", pid: "2", sid: "4" },
-        { id: "6", pid: "3", sid: "1" },
-        { id: "7", pid: "4", sid: "2" },
-        { id: "8", pid: "4", sid: "8" },
-        { id: "9", pid: "4", sid: "9" },
-        { id: "10", pid: "5", sid: "1" },
-      ];
-      // inserts projectsSkills
-      projectsSkills.forEach((oneProjectSkill) => {
-        db.run(
-          "INSERT INTO projectsSkills (psid, pid, sid) VALUES (?, ?, ?)",
-          [oneProjectSkill.id, oneProjectSkill.pid, oneProjectSkill.sid],
-          (error) => {
-            if (error) {
-              console.log("ERROR: ", error);
-            } else {
-              console.log("Line added into the projectsSkills table!");
+              console.log("Line added into the user table!");
             }
           }
         );
