@@ -7,6 +7,7 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const connectSqlite3 = require("connect-sqlite3");
 const bcrypt = require("bcrypt");
+const csurf = require("csurf");
 
 const sqlite3 = require("sqlite3");
 const db = new sqlite3.Database("project-jl.db");
@@ -35,6 +36,7 @@ app.get("/", function (req, res) {
     name: req.session.name,
     isAdmin: req.session.isAdmin,
     title: "Home",
+    userId: req.session.userId,
   };
   res.render("home.handlebars", model);
 });
@@ -50,6 +52,7 @@ app.get("/humans", function (req, res) {
         name: req.session.name,
         isAdmin: req.session.isAdmin,
         title: "humans",
+        userId: req.session.userId,
       };
       res.render("humans.handlebars", model);
     } else {
@@ -61,6 +64,7 @@ app.get("/humans", function (req, res) {
         name: req.session.name,
         isAdmin: req.session.isAdmin,
         title: "Humans",
+        userId: req.session.userId,
       };
       console.log("session: ", req.session);
       res.render("humans.handlebars", model);
@@ -74,6 +78,7 @@ app.get("/humans/new", (req, res) => {
       name: req.session.name,
       isAdmin: req.session.isAdmin,
       title: "New Product",
+      userId: req.session.userId,
     };
     res.render("newproduct.handlebars", model);
   } else {
@@ -88,10 +93,14 @@ app.post("/humans/new", (req, res) => {
     req.body.prodesc,
     req.body.protype,
     req.body.proimg,
+    req.body.procolor,
+    req.body.proalcohol,
+    req.body.provolume,
+    req.body.prothumbnail,
   ];
   if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
     db.run(
-      "INSERT INTO projects(pname, pyear, pdesc, ptype, pimgURL) VALUES (?,?,?,?,?)",
+      "INSERT INTO projects(pname, pyear, pdesc, ptype, pimgURL, pcolor, palcohol, pvolume, pthumbnail) VALUES (?,?,?,?,?,?,?,?,?)",
       newp,
       (error) => {
         if (error) {
@@ -108,6 +117,7 @@ app.post("/humans/new", (req, res) => {
 });
 app.get("/humans/:id", (req, res) => {
   const id = req.params.id;
+
   db.get(
     "SELECT * FROM projects WHERE pid = ?",
     [id],
@@ -117,29 +127,71 @@ app.get("/humans/:id", (req, res) => {
           hasDatabaseError: true,
           theError: error,
           project: {},
+          reviews: [], // Initialize an empty array for reviews
           isAdmin: req.session.isAdmin,
           isLoggedIn: req.session.isLoggedIn,
           name: req.session.name,
           title: id,
         };
-        console.log("error");
         res.render("human.handlebars", model);
       } else {
-        const model = {
-          hasDatabaseError: false,
-          theError: "",
-          project: foundProject,
-          isAdmin: req.session.isAdmin,
-          isLoggedIn: req.session.isLoggedIn,
-          name: req.session.name,
-          title: id,
-        };
-        res.render("human.handlebars", model);
+        db.all(
+          "SELECT reviews.*, users.uun FROM reviews LEFT JOIN users ON reviews.uid = users.uid WHERE reviews.pid = ?",
+          [id],
+          function (error, foundReviews) {
+            if (error) {
+              const model = {
+                hasDatabaseError: true,
+                theError: error,
+                project: {},
+                reviews: [], // Initialize an empty array for reviews
+                isAdmin: req.session.isAdmin,
+                isLoggedIn: req.session.isLoggedIn,
+                userId: req.session.userId,
+                title: id,
+              };
+              res.render("human.handlebars", model);
+            } else {
+              const model = {
+                hasDatabaseError: false,
+                theError: "",
+                project: foundProject,
+                reviews: foundReviews, // Assign the reviews data to the 'reviews' property
+                isAdmin: req.session.isAdmin,
+                isLoggedIn: req.session.isLoggedIn,
+                userId: req.session.userId,
+                title: id,
+              };
+              res.render("human.handlebars", model);
+            }
+          }
+        );
       }
     }
   );
 });
+app.post("/humans/:id/reviews", (req, res) => {
+  const projectId = req.params.id;
+  const { reviewText, rating } = req.body;
+  const userId = req.session.userId;
+  const userName = req.session.name;
 
+  // Insert the review into the database
+  db.run(
+    "INSERT INTO reviews (uid, pid, review, rating, uname) VALUES (?, ?, ?, ?, ?)",
+    [userId, projectId, reviewText, rating, userName],
+    (error) => {
+      if (error) {
+        console.error("Error inserting review into the database:", error);
+        res.status(500).send("Error submitting review.");
+      } else {
+        // Redirect the user back to the project page after submitting the review
+        res.redirect(`/humans/${projectId}`);
+        console.log(userName);
+      }
+    }
+  );
+});
 app.get("/humans/update/:id", (req, res) => {
   const id = req.params.id;
   db.get(
@@ -165,14 +217,36 @@ app.get("/humans/update/:id", (req, res) => {
           isAdmin: req.session.isAdmin,
           name: req.session.name,
           isLoggedIn: req.session.isLoggedIn,
+          userId: req.session.userId,
           helpers: {
-            theTypeR(value) {
-              return value == "Research";
+            theType1(value) {
+              return value == "Ale";
             },
-            theTypeT(value) {
-              return value == "Teaching";
+            theType2(value) {
+              return value == "Lager";
             },
-            theTypeO(value) {
+            theType3(value) {
+              return value == "Pilsner";
+            },
+            theType4(value) {
+              return value == "Porter";
+            },
+            theType5(value) {
+              return value == "IPA";
+            },
+            theType6(value) {
+              return value == "APA";
+            },
+            theType7(value) {
+              return value == "Stout";
+            },
+            theType8(value) {
+              return value == "Weizenbock";
+            },
+            theType9(value) {
+              return value == "bitter";
+            },
+            theType10(value) {
               return value == "Other";
             },
           },
@@ -191,11 +265,15 @@ app.post("/humans/update/:id", (req, res) => {
     req.body.prodesc,
     req.body.protype,
     req.body.proimg,
+    req.body.procolor,
+    req.body.proalcohol,
+    req.body.provolume,
+    req.body.prothumbnail,
     id,
   ];
   if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
     db.run(
-      "UPDATE projects SET pname=?, pyear=?, pdesc=?, ptype=?, pimgURL=? WHERE pid=?",
+      "UPDATE projects SET pname=?, pyear=?, pdesc=?, ptype=?, pimgURL=?, pcolor=?, palcohol=?, pvolume=?, pthumbnail=? WHERE pid=?",
       newp,
       (error) => {
         if (error) {
@@ -226,6 +304,7 @@ app.get("/humans/delete/:id", (req, res) => {
             isAdmin: req.session.isAdmin,
             name: req.session.name,
             isLoggedIn: req.session.isLoggedIn,
+            userId: req.session.userId,
           };
           console.log("error");
           res.render("home.handlebars", model);
@@ -237,6 +316,7 @@ app.get("/humans/delete/:id", (req, res) => {
             isAdmin: req.session.isAdmin,
             name: req.session.name,
             isLoggedIn: req.session.isLoggedIn,
+            userId: req.session.userId,
           };
           res.render("home.handlebars", model);
           res.redirect("/humans");
@@ -254,6 +334,7 @@ app.get("/login", (req, res) => {
     name: req.session.name,
     isAdmin: req.session.isAdmin,
     title: "Home",
+    userId: req.session.userId,
   };
   res.render("login.handlebars", model);
 });
@@ -274,7 +355,8 @@ app.post("/login", (req, res) => {
           req.session.isAdmin = false;
         }
         req.session.isLoggedIn = true;
-        req.session.name = oneUser.name;
+        req.session.name = oneUser.uun;
+        req.session.userId = oneUser.uid;
         res.redirect("/");
       } else {
         res.status(401).send({ error: "Wrong password" });
@@ -289,6 +371,7 @@ app.get("/signup", (req, res) => {
     name: req.session.name,
     isAdmin: req.session.isAdmin,
     title: "sign up",
+    userId: req.session.userId,
   };
   res.render("signup.handlebars", model);
 });
@@ -303,7 +386,7 @@ app.post("/signup", (req, res) => {
     [username, "admin", username, hash],
     (err) => {
       if (err) {
-        res.status(500).send({ error: "Server error" });
+        res.status(500).send({ error: "Server errorsignup" });
       } else {
         res.redirect("/login");
       }
@@ -319,7 +402,7 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 db.run(
-  "CREATE TABLE projects (pid INTEGER PRIMARY KEY AUTOINCREMENT, pname TEXT NOT NULL, pyear INTEGER NOT NULL, pdesc TEXT NOT NULL, ptype TEXT NOT NULL, pimgURL TEXT NOT NULL)",
+  "CREATE TABLE projects (pid INTEGER PRIMARY KEY AUTOINCREMENT, pname TEXT NOT NULL, pyear INTEGER NOT NULL, pdesc TEXT NOT NULL, ptype TEXT NOT NULL, pimgURL TEXT NOT NULL, pcolor TEXT NOT NULL, palcohol INTEGER NOT NULL, pvolume INTEGER NOT NULL, pthumbnail TEXT NOT NULL)",
   (error) => {
     if (error) {
       // tests error: display error
@@ -331,25 +414,32 @@ db.run(
         {
           id: "1",
           name: "Counting people with a camera",
-          type: "research",
-          desc: "The purpose of this project is to count people passing through a corridor and to know how many are in the room at a certain time.",
+          type: "Ale",
+          desc: " Pistonhead Kustom Lager is Kustom brewed with a double-clutch of Münchener and Pilsner malt injected with Spalter Select, Magnum and Perle hops that will leave a hint of bitterness on your lips, but never in your heart.",
           year: 2022,
-          dev: "Python and OpenCV (Computer vision) library",
-          url: "/img/tårta.png",
+          url: "/img/mockup.png",
+          color: "blue",
+          alcohol: 5.0,
+          volume: 33,
+          thumbnail: "/img/mockup.png",
         },
         {
           id: "2",
           name: "Visualisation of 3D medical images",
-          type: "research",
-          desc: "The project makes a 3D model of the analysis of the body of a person and displays the detected health problems. It is useful for doctors to view in 3D their patients and the evolution of a disease.",
+          type: "Lager",
+          desc: " Pistonhead Kustom Lager is Kustom brewed with a double-clutch of Münchener and Pilsner malt injected with Spalter Select, Magnum and Perle hops that will leave a hint of bitterness on your lips, but never in your heart.",
           year: 2012,
-          url: "/img/kanelbulle.jpg",
+          url: "/img/mockup.png",
+          color: "blue",
+          alcohol: 5.0,
+          volume: 33,
+          thumbnail: "/img/mockup.png",
         },
       ];
       // inserts projects
       projects.forEach((oneProject) => {
         db.run(
-          "INSERT INTO projects (pid, pname, pyear, pdesc, ptype, pimgURL) VALUES (?, ?, ?, ?, ?, ?)",
+          "INSERT INTO projects (pid, pname, pyear, pdesc, ptype, pimgURL, pcolor, palcohol, pvolume, pthumbnail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
           [
             oneProject.id,
             oneProject.name,
@@ -357,6 +447,10 @@ db.run(
             oneProject.desc,
             oneProject.type,
             oneProject.url,
+            oneProject.color,
+            oneProject.alcohol,
+            oneProject.volume,
+            oneProject.thumbnail,
           ],
           (error) => {
             if (error) {
@@ -407,6 +501,52 @@ db.run(
   }
 );
 
+db.run(
+  "CREATE TABLE reviews (rid INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER, pid INTEGER, review TEXT NOT NULL, rating INTEGER NOT NULL, uname TEXT NOT NULL,  FOREIGN KEY(uid) REFERENCES users(uid), FOREIGN KEY(pid) REFERENCES projects(pid), FOREIGN KEY(uname) REFERENCES users(uname))",
+  (error) => {
+    if (error) {
+      console.log("ERROR: ", error);
+    } else {
+      console.log("---> Table reviews created!");
+      const reviews = [
+        {
+          uid: 1,
+          pid: 1,
+          review: "Woow tase like shit",
+          rating: 5,
+          username: "ebrin",
+        },
+        {
+          uid: 1,
+          pid: 2,
+          review: "Woow tase like beer",
+          rating: 1,
+          username: "ebrin",
+        },
+      ];
+      // inserts reviews
+      reviews.forEach((oneReview) => {
+        db.run(
+          "INSERT INTO reviews (uid, pid, review, rating, uname) VALUES (?, ?, ?, ?, ?)",
+          [
+            oneReview.uid,
+            oneReview.pid,
+            oneReview.review,
+            oneReview.rating,
+            oneReview.username,
+          ],
+          (error) => {
+            if (error) {
+              console.log("ERROR: ", error);
+            } else {
+              console.log("Line added into the reviews table!");
+            }
+          }
+        );
+      });
+    }
+  }
+);
 app.use(function (req, res) {
   res.status(404).render("404.handlebars");
 });

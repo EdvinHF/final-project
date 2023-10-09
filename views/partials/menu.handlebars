@@ -22,16 +22,34 @@
     </section>
     {{#if isLoggedIn}}
       <section class="navbar-section">
-        <a class="menu-link" href="/logout">
-          <p class="menu-item" class="column col-5 col-auto">LOG OUT</p>
-        </a>
+        <div class="dropdown">
+          <div class="dropdown-button">
+
+            <img src="/img/User_alt_fill.png" alt="" />
+            <p>My Account</p>
+
+          </div>
+          <div class="dropdown-content">
+            <a href="/logout">Log Out</a>
+            {{#if isAdmin}}
+              <a href="/logout">Manage Users</a>
+            {{/if}}
+
+          </div>
+        </div>
       </section>
     {{else}}
       <section class="navbar-section">
-        <a class="menu-link" href="/login">
-          <p class="menu-item" class="column col-5 col-auto">LOG IN</p>
-        </a>
+        <div class="dropdown">
+          <div class="dropdown-button">
+            <a class="flex" href="/login">
+              <img src="/img/User_alt.png" alt="" />
+              <p>Log in</p>
+            </a>
+          </div>
+        </div>
       </section>
+
     {{/if}}
 
   </nav>

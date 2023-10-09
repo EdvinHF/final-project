@@ -2,6 +2,7 @@
   <div class="form-container">
     <h1 class="login-text">Create Account</h1>
     <form action="/signup" method="POST" class="login-form">
+      <!--
       <section class="required">
         <input
           type="text"
@@ -32,26 +33,23 @@
         />
         <p>*</p>
       </section>
-      <section class="required">
-        <input
-          type="Username"
-          name="Username"
-          placeholder="Username"
-          required="required"
-          class="login-input"
-        />
-        <p>*</p>
-      </section>
-      <section class="required">
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          required="required"
-          class="login-input"
-        />
-        <p>*</p>
-      </section>
+      -->
+      <input
+        type="text"
+        name="username"
+        placeholder="Username"
+        required="required"
+        class="login-input"
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        required="required"
+        class="login-input"
+      />
+
+      <!--
       <section class="required">
         <input
           type="password"
@@ -62,6 +60,7 @@
         />
         <p>*</p>
       </section>
+      -->
       <input class="submitbutton" type="submit" value="Sign Up" />
     </form>
   </div>
