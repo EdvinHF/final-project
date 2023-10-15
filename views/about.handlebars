@@ -1,0 +1,32 @@
+<div id="main">
+  <div>
+    <div class="hero-text">
+      <h1 class="hero-headline">About Us</h1>
+
+      <p class="hero-runner">Lorem ipsum, dolor sit amet consectetur adipisicing
+        elit. Culpa adipisci minus aliquam vel, facere consequuntur harum nulla
+        eveniet enim perferendis, ducimus iusto consectetur eaque, delectus
+        officia? Optio officia tenetur molestiae!</p>
+    </div>
+    <div class="event-section">
+      <div class="event-headline-container">
+        <h1 class="event-headline">Upcoming Events</h1>
+      </div>
+      <div class="add-event-container">
+        <img class="add-event" src="/img/Add_light.svg" alt="" />
+      </div>
+      {{#each events}}
+        <div class="event-container">
+          <img class="event-background" src="{{ethumbnail}}" alt="" />
+          <div class="event-info">
+            <h2>{{ename}}</h2>
+            <p>{{edesc}}</p>
+            <a href="/about/{{eid}}">
+              <button class="submitbutton">Check it out</button>
+            </a>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</div>

@@ -40,6 +40,66 @@ app.get("/", function (req, res) {
   };
   res.render("home.handlebars", model);
 });
+app.get("/about", function (req, res) {
+  db.all("SELECT * FROM events", function (error, theEvents) {
+    if (error) {
+      const model = {
+        hasDatabaseError: true,
+        theError: error,
+        events: [],
+        isLoggedIn: req.session.isLoggedIn,
+        name: req.session.name,
+        isAdmin: req.session.isAdmin,
+        title: "about",
+        userId: req.session.userId,
+      };
+      res.render("about.handlebars", model);
+    } else {
+      const model = {
+        hasDatabaseError: false,
+        theError: "",
+        events: theEvents,
+        isLoggedIn: req.session.isLoggedIn,
+        name: req.session.name,
+        isAdmin: req.session.isAdmin,
+        title: "Humans",
+        userId: req.session.userId,
+      };
+      console.log("session: ", req.session);
+      res.render("about.handlebars", model);
+    }
+  });
+});
+app.get("/about/:id", (req, res) => {
+  const id = req.params.id;
+
+  db.get(
+    "SELECT * FROM events WHERE eid = ?",
+    [id],
+    function (error, foundEvent) {
+      if (error) {
+        const model = {
+          hasDatabaseError: true,
+          theError: error,
+          events: {},
+          isAdmin: req.session.isAdmin,
+          isLoggedIn: req.session.isLoggedIn,
+          name: req.session.name,
+        };
+        res.render("event.handlebars", model);
+      } else {
+        const model = {
+          hasDatabaseError: false,
+          theError: "",
+          event: foundEvent,
+          isLoggedIn: req.session.isLoggedIn,
+          userId: req.session.userId,
+        };
+        res.render("event.handlebars", model);
+      }
+    }
+  );
+});
 
 app.get("/humans", function (req, res) {
   db.all("SELECT * FROM projects", function (error, theProjects) {
@@ -547,6 +607,49 @@ db.run(
     }
   }
 );
+
+db.run(
+  "CREATE TABLE events (eid INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, location TEXT NOT NULL, edesc TEXT NOT NULL, ethumbnail INTEGER NOT NULL, ename TEXT NOT NULL)",
+  (error) => {
+    if (error) {
+      console.log("ERROR: ", error);
+    } else {
+      console.log("---> Table events created!");
+      const events = [
+        {
+          eid: 1,
+          date: "2023-10-15",
+          location: "jönköping",
+          description:
+            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
+          thumbnail: "/img/chokladboll.jpg",
+          name: "Drinking beer event",
+        },
+      ];
+      events.forEach((oneEvent) => {
+        db.run(
+          "INSERT INTO events (eid, date, location, edesc, ethumbnail, ename) VALUES (?, ?, ?, ?, ?, ?)",
+          [
+            oneEvent.eid,
+            oneEvent.date,
+            oneEvent.location,
+            oneEvent.description,
+            oneEvent.thumbnail,
+            oneEvent.name,
+          ],
+          (error) => {
+            if (error) {
+              console.log("ERROR: ", error);
+            } else {
+              console.log("Line added into the reviews table!");
+            }
+          }
+        );
+      });
+    }
+  }
+);
+
 app.use(function (req, res) {
   res.status(404).render("404.handlebars");
 });
