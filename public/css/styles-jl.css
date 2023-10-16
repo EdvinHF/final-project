@@ -15,6 +15,7 @@ a:focus {
 }
 a {
   color: black;
+  text-decoration: none;
 }
 a:hover {
   color: rgb(136, 136, 136);
@@ -64,15 +65,32 @@ a:hover {
 }
 .bakery-goods {
   height: 500px;
-  background-color: rgb(43, 43, 43);
   overflow: hidden;
   display: flex;
   align-items: center;
   flex-direction: column;
+  justify-content: center;
+  position: relative;
+  background-color: #1d1d1d4b;
 }
 
 .product-image {
-  height: 600px;
+  height: 400px;
+  padding-top: 20px;
+}
+
+.product-image:hover {
+  animation-duration: 0.5s;
+  animation-name: rotate;
+  animation-fill-mode: forwards;
+}
+@keyframes rotate {
+  from {
+  }
+
+  to {
+    transform: rotate(-10deg);
+  }
 }
 
 .product-information {
@@ -81,12 +99,12 @@ a:hover {
   justify-content: center;
   font-size: 15pt;
   font-weight: 600;
+  position: absolute;
 }
 
 .product-remove-edit {
   height: 100%;
   padding-right: 2%;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,11 +112,22 @@ a:hover {
   width: 77px;
 }
 .under-img {
-  position: absolute;
   width: 400px;
-  height: 15%;
+  height: fit-content;
   display: flex;
   align-items: center;
+  position: absolute;
+  bottom: 440px;
+  flex-direction: row-reverse;
+  gap: 5px;
+}
+@keyframes slidedown {
+  from {
+  }
+
+  to {
+    transform: rotate(-10deg);
+  }
 }
 
 .description-new {
@@ -279,7 +308,7 @@ input:-webkit-autofill:active {
   align-items: center;
 }
 .product-page-img {
-  max-width: 400px;
+  max-width: 300px;
   min-width: 200px;
 }
 .product-page-container {
@@ -293,12 +322,14 @@ input:-webkit-autofill:active {
   justify-content: flex-end;
 }
 .product-info {
-  margin-top: 40px;
+  margin-top: 80px;
   max-width: 600px;
+  margin-top: 100px;
+  margin-bottom: 70px;
 }
 .product-atributes {
   display: flex;
-
+  margin-top: 20px;
   width: 220px;
   flex-wrap: wrap;
 }
@@ -307,6 +338,7 @@ input:-webkit-autofill:active {
   text-align: center;
   padding: 10px;
   width: 80px;
+  font-size: 11pt;
 }
 
 .atribute-description {
@@ -327,13 +359,6 @@ input:-webkit-autofill:active {
   font-size: 10pt;
   margin: 0;
   margin-top: -2px;
-}
-.product-info::after {
-  content: "";
-  display: block;
-  width: 100%;
-  height: 5px;
-  background: #fcfcfc;
 }
 
 .reviews-header {
@@ -399,18 +424,15 @@ input:-webkit-autofill:active {
   border-radius: 10px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
   background: #1d1d1d;
   width: 0;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
   background: #3a3a3a;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #252525;
 }
@@ -542,4 +564,49 @@ p {
 .event-reverse {
   display: flex;
   flex-direction: column-reverse;
+}
+#map {
+  height: 300px;
+
+  width: 60vw;
+  border-radius: 20px;
+}
+.contact-list {
+  list-style: none;
+}
+.contact-card {
+  max-width: 400px;
+  min-width: 300px;
+  background-color: #05050656;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+}
+.contact-card-container {
+  display: flex;
+  gap: 30px;
+}
+.contact-map-card-container {
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 100px;
+}
+.contact-img {
+  height: 20px;
+  width: auto;
+}
+.user-rating {
+  width: 400px;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 20px;
+  padding-bottom: 5pt;
+  font-size: 13pt;
+  font-weight: 600;
+}
+.review-text {
+  font-size: 10pt;
 }

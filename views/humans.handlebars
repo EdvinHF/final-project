@@ -19,17 +19,16 @@
             <img class="product-image" src="{{pthumbnail}}" />
             </a>
             <div class="under-img">
+              
               <div class="product-information">
             <a class="product-name" href="/humans/{{pid}}">{{pname}}</a>
             </div>
             {{#if ../isAdmin}}
             <div class="product-remove-edit">
-              <a href="/humans/update/{{pid}}"><img src="/img/Edit.png" alt=""></a><a href="/humans/delete/{{pid}}"><img src="/img/close_ring.png" alt=""></a>
+              <a href="/humans/delete/{{pid}}"><img src="/img/close_ring.png" alt=""></a><a href="/humans/update/{{pid}}"><img src="/img/Edit.png" alt=""></a>
             </div>
              {{/if}}
             </div>
-           
-            
           </div>
         {{/each}}
       {{/if}}

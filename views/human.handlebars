@@ -43,7 +43,7 @@
             <summary class="reviews-header">
               
               <p class="reviews-header-item">Reviews</p>
-              <p class="reviews-header-item">5.0</p>
+              <p class="reviews-header-item">{{averageRating}}</p>
             
             </summary>
             <div> 
@@ -78,10 +78,12 @@
               </div>
               
               {{#each reviews}}
-                <li>
-                  <strong>Username: {{uname}}</strong><br />
-                  <strong>Rating: {{rating}}</strong><br />
-                  {{review}}
+                <div class="user-rating">
+
+                  <p>{{uname}}</p>
+                  <p>Rating: {{rating}}</p>
+                </div>
+                  <p class="review-text">{{review}}</p>
                 </li>
               {{/each}}
             </details>

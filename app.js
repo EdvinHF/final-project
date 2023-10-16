@@ -40,6 +40,17 @@ app.get("/", function (req, res) {
   };
   res.render("home.handlebars", model);
 });
+app.get("/contact", function (req, res) {
+  console.log("session: ", req.session);
+  const model = {
+    isLoggedIn: req.session.isLoggedIn,
+    name: req.session.name,
+    isAdmin: req.session.isAdmin,
+    title: "Contact",
+    userId: req.session.userId,
+  };
+  res.render("contact.handlebars", model);
+});
 app.get("/about", function (req, res) {
   db.all("SELECT * FROM events", function (error, theEvents) {
     if (error) {
@@ -322,40 +333,28 @@ app.get("/humans/:id", (req, res) => {
     [id],
     function (error, foundProject) {
       if (error) {
-        const model = {
-          hasDatabaseError: true,
-          theError: error,
-          project: {},
-          reviews: [], // Initialize an empty array for reviews
-          isAdmin: req.session.isAdmin,
-          isLoggedIn: req.session.isLoggedIn,
-          name: req.session.name,
-          title: id,
-        };
-        res.render("human.handlebars", model);
+        // Handle error
       } else {
         db.all(
           "SELECT reviews.*, users.uun FROM reviews LEFT JOIN users ON reviews.uid = users.uid WHERE reviews.pid = ?",
           [id],
           function (error, foundReviews) {
             if (error) {
-              const model = {
-                hasDatabaseError: true,
-                theError: error,
-                project: {},
-                reviews: [], // Initialize an empty array for reviews
-                isAdmin: req.session.isAdmin,
-                isLoggedIn: req.session.isLoggedIn,
-                userId: req.session.userId,
-                title: id,
-              };
-              res.render("human.handlebars", model);
+              // Handle error
             } else {
+              // Calculate average rating
+              const totalRating = foundReviews.reduce(
+                (sum, review) => sum + review.rating,
+                0
+              );
+              const averageRating = totalRating / foundReviews.length;
+
               const model = {
                 hasDatabaseError: false,
                 theError: "",
                 project: foundProject,
-                reviews: foundReviews, // Assign the reviews data to the 'reviews' property
+                reviews: foundReviews,
+                averageRating: averageRating.toFixed(2), // Rounded to 2 decimal places
                 isAdmin: req.session.isAdmin,
                 isLoggedIn: req.session.isLoggedIn,
                 userId: req.session.userId,
@@ -582,7 +581,7 @@ app.post("/signup", (req, res) => {
 
   db.run(
     "INSERT INTO users (uname, urole, uun, upw) VALUES (?, ?, ?, ?)",
-    [username, "admin", username, hash],
+    [username, "customer", username, hash],
     (err) => {
       if (err) {
         res.status(500).send({ error: "Server errorsignup" });
@@ -616,11 +615,11 @@ db.run(
           type: "Ale",
           desc: " Pistonhead Kustom Lager is Kustom brewed with a double-clutch of Münchener and Pilsner malt injected with Spalter Select, Magnum and Perle hops that will leave a hint of bitterness on your lips, but never in your heart.",
           year: 2022,
-          url: "/img/mockup.png",
+          url: "/img/Product-img.svg",
           color: "blue",
           alcohol: 5.0,
           volume: 33,
-          thumbnail: "/img/mockup.png",
+          thumbnail: "/img/Product-img.svg",
         },
         {
           id: "2",
@@ -628,11 +627,11 @@ db.run(
           type: "Lager",
           desc: " Pistonhead Kustom Lager is Kustom brewed with a double-clutch of Münchener and Pilsner malt injected with Spalter Select, Magnum and Perle hops that will leave a hint of bitterness on your lips, but never in your heart.",
           year: 2012,
-          url: "/img/mockup.png",
+          url: "/img/Product-img.svg",
           color: "blue",
           alcohol: 5.0,
           volume: 33,
-          thumbnail: "/img/mockup.png",
+          thumbnail: "/img/Product-img.svg",
         },
       ];
       // inserts projects
@@ -684,9 +683,10 @@ db.run(
       ];
       // inserts projects
       users.forEach((oneUser) => {
+        const hashedPassword = bcrypt.hashSync(oneUser.pw, 10);
         db.run(
           "INSERT INTO users (uid, uname, urole, uun, upw) VALUES (?, ?, ?, ?, ?)",
-          [oneUser.id, oneUser.name, oneUser.role, oneUser.un, oneUser.pw],
+          [oneUser.id, oneUser.name, oneUser.role, oneUser.un, hashedPassword],
           (error) => {
             if (error) {
               console.log("ERROR: ", error);
