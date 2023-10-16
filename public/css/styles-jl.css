@@ -539,3 +539,7 @@ p {
   animation-name: changefill;
   animation-fill-mode: forwards;
 }
+.event-reverse {
+  display: flex;
+  flex-direction: column-reverse;
+}

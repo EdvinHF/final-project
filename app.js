@@ -70,6 +70,45 @@ app.get("/about", function (req, res) {
     }
   });
 });
+app.get("/about/new", (req, res) => {
+  if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
+    const model = {
+      isLoggedIn: req.session.isLoggedIn,
+      name: req.session.name,
+      isAdmin: req.session.isAdmin,
+      title: "New Event",
+      userId: req.session.userId,
+    };
+    res.render("newevent.handlebars", model);
+  } else {
+    res.redirect("/login");
+  }
+});
+app.post("/about/new", (req, res) => {
+  const newe = [
+    req.body.eventdate,
+    req.body.eventlocation,
+    req.body.eventdesc,
+    req.body.eventthumbnail,
+    req.body.eventname,
+  ];
+  if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
+    db.run(
+      "INSERT INTO events (date, location, edesc, ethumbnail, ename) VALUES (?, ?, ?, ?, ?)",
+      newe,
+      (error) => {
+        if (error) {
+          console.log("error", error);
+        } else {
+          console.log("line was added into event table!");
+        }
+      }
+    );
+    res.redirect("/about");
+  } else {
+    res.redirect("/login");
+  }
+});
 app.get("/about/:id", (req, res) => {
   const id = req.params.id;
 
@@ -99,6 +138,106 @@ app.get("/about/:id", (req, res) => {
       }
     }
   );
+});
+
+app.get("/about/update/:id", (req, res) => {
+  const id = req.params.id;
+  db.get(
+    "SELECT * FROM events where eid =?",
+    [id],
+    function (error, theEvents) {
+      if (error) {
+        const model = {
+          hasDatabaseError: true,
+          theError: error,
+          event: {},
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+          isLoggedIn: req.session.isLoggedIn,
+        };
+        console.log("error", error);
+        res.render("editevent.handlebars", model);
+      } else {
+        const model = {
+          hasDatabaseError: false,
+          theError: "",
+          event: theEvents,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+          isLoggedIn: req.session.isLoggedIn,
+          userId: req.session.userId,
+        };
+        res.render("editevent.handlebars", model);
+      }
+    }
+  );
+});
+
+app.post("/about/update/:id", (req, res) => {
+  const id = req.params.id;
+  const newe = [
+    req.body.eventdate,
+    req.body.eventlocation,
+    req.body.eventdesc,
+    req.body.eventthumbnail,
+    req.body.eventname,
+    id,
+  ];
+  if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
+    db.run(
+      "UPDATE events SET date=?, location=?, edesc=?, ethumbnail=?, ename =? WHERE eid=?",
+      newe,
+      (error) => {
+        if (error) {
+          console.log("erroe", error);
+        } else {
+          console.log("updated");
+        }
+        res.redirect("/about");
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
+});
+
+app.get("/about/delete/:id", (req, res) => {
+  const id = req.params.id;
+  if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
+    db.run(
+      "DELETE FROM events where eid =?",
+      [id],
+      function (error, theEvents) {
+        if (error) {
+          const model = {
+            hasDatabaseError: true,
+            theError: error,
+            events: [],
+            isAdmin: req.session.isAdmin,
+            name: req.session.name,
+            isLoggedIn: req.session.isLoggedIn,
+            userId: req.session.userId,
+          };
+          console.log("error");
+          res.render("home.handlebars", model);
+        } else {
+          const model = {
+            hasDatabaseError: false,
+            theError: "",
+            event: theEvents,
+            isAdmin: req.session.isAdmin,
+            name: req.session.name,
+            isLoggedIn: req.session.isLoggedIn,
+            userId: req.session.userId,
+          };
+          res.render("home.handlebars", model);
+          res.redirect("/about");
+        }
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.get("/humans", function (req, res) {

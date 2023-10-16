@@ -1,0 +1,72 @@
+<div id="main">
+  <div>
+    {{#if isLoggedIn}}
+      {{#if isAdmin}}
+        <form
+          action="/about/update/{{event.eid}}"
+          method="post"
+          class="login-form"
+        >
+          <fieldset>
+            <label for="eventname">Event name:</label>
+            <input
+              class="login-input"
+              type="text"
+              name="eventname"
+              id="eventname"
+              required="required"
+              value="{{event.ename}}"
+            />
+            <br />
+            <label for="eventdate">Event date:</label>
+            <input
+              class="login-input"
+              type="date"
+              name="eventdate"
+              id="eventdate"
+              placeholder="6969"
+              required="required"
+              value="{{event.date}}"
+            />
+            <br />
+            <label for="eventdesc">Description:</label>
+            <textarea
+              class="login-input"
+              name="eventdesc"
+              id="eventdesc"
+              cols="30"
+              rows="10"
+              required="required"
+            >{{event.edesc}}</textarea>
+            <br />
+            <label for="eventthumbnail">Background image</label>
+            <input
+              class="login-input"
+              type="text"
+              id="eventthumbnail"
+              name="eventthumbnail"
+              placeholder="blue"
+              required="required"
+              value="{{event.ethumbnail}}"
+            />
+
+            <label for="eventlocation">Location</label>
+            <input
+              class="login-input"
+              type="text"
+              name="eventlocation"
+              id="eventlocation"
+              required="required"
+              value="{{event.location}}"
+            />
+          </fieldset>
+          <input type="submit" value="Submit changes" class="submitbutton" />
+        </form>
+      {{else}}
+        <p>You can't do this.</p>
+      {{/if}}
+    {{else}}
+      <p>No way, José.</p>
+    {{/if}}
+  </div>
+</div>

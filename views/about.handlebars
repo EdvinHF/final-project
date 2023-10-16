@@ -12,21 +12,31 @@
       <div class="event-headline-container">
         <h1 class="event-headline">Upcoming Events</h1>
       </div>
-      <div class="add-event-container">
-        <img class="add-event" src="/img/Add_light.svg" alt="" />
-      </div>
-      {{#each events}}
-        <div class="event-container">
-          <img class="event-background" src="{{ethumbnail}}" alt="" />
-          <div class="event-info">
-            <h2>{{ename}}</h2>
-            <p>{{edesc}}</p>
-            <a href="/about/{{eid}}">
-              <button class="submitbutton">Check it out</button>
-            </a>
-          </div>
+      {{#if isAdmin}}
+        <div class="add-event-container">
+          <a href="/about/new">
+            <img class="add-event" src="/img/Add_light.svg" alt="" />
+          </a>
         </div>
-      {{/each}}
+      {{/if}}
+      <div class="event-reverse">
+        {{#each events}}
+            
+          <div class="event-container">
+            <img class="event-background" src="{{ethumbnail}}" alt="" />
+            <div class="event-info">
+              {{#if ../isAdmin}}
+              <a href="/about/update/{{eid}}"><img src="/img/Edit.png" alt=""></a><a href="/about/delete/{{eid}}"><img src="/img/close_ring.png" alt=""></a>
+             {{/if}}
+              <h2>{{ename}}</h2>
+              <p>{{edesc}}</p>
+              <a href="/about/{{eid}}">
+                <button class="submitbutton">Check it out</button>
+              </a>
+            </div>
+          </div>
+        {{/each}}
+      </div>
     </div>
   </div>
 </div>
