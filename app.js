@@ -575,21 +575,34 @@ app.get("/signup", (req, res) => {
 });
 
 app.post("/signup", (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, passwordConfirm } = req.body;
 
+  console.log(req.body);
   const hash = bcrypt.hashSync(password, 10);
-
-  db.run(
-    "INSERT INTO users (uname, urole, uun, upw) VALUES (?, ?, ?, ?)",
-    [username, "customer", username, hash],
-    (err) => {
-      if (err) {
-        res.status(500).send({ error: "Server errorsignup" });
-      } else {
-        res.redirect("/login");
+  const model = {
+    isLoggedIn: req.session.isLoggedIn,
+    name: req.session.name,
+    isAdmin: req.session.isAdmin,
+    title: "sign up",
+    userId: req.session.userId,
+    notMatching: "not-matching",
+  };
+  if (password == passwordConfirm) {
+    db.run(
+      "INSERT INTO users (uname, urole, uun, upw) VALUES (?, ?, ?, ?)",
+      [username, "customer", username, hash],
+      (err) => {
+        if (err) {
+          res.status(500).send({ error: "Server errorsignup" });
+        } else {
+          res.redirect("/login");
+          console.log("line was added to the table");
+        }
       }
-    }
-  );
+    );
+  } else {
+    res.render("signup.handlebars", model);
+  }
 });
 
 app.get("/logout", (req, res) => {

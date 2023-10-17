@@ -610,3 +610,105 @@ p {
 .review-text {
   font-size: 10pt;
 }
+#not-matching {
+  animation-name: notmatching;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+#wrong-pw-or-un {
+  animation-name: notmatching;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+@keyframes notmatching {
+  0% {
+    border-color: rgb(117, 30, 30);
+  }
+  90% {
+    border-color: rgb(117, 30, 30);
+  }
+  100% {
+    border-color: rgb(20, 20, 20);
+  }
+}
+@media only screen and (max-width: 900px) {
+  .menu-item {
+    display: none;
+  }
+  .dropdown {
+    display: none;
+  }
+}
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+@media only screen and (min-width: 900px) {
+  .hamburger,
+  .sidebar,
+  .checkbox,
+  .hamburger::before,
+  .hamburger::after,
+  .hamburger input {
+    display: none;
+  }
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+.hamburger::before,
+.hamburger::after,
+.hamburger input {
+  content: "";
+  width: 30px;
+  height: 4px;
+  background-color: #242424;
+  transform-origin: left center;
+  transition: 200ms ease-in-out;
+  border-radius: 1000000000000000000000000000000px;
+}
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  width: max-content;
+  position: absolut;
+  top: 5px;
+  left: 5px;
+  cursor: pointer;
+}
+.hamburger:has(input:checked)::before {
+  rotate: 45deg;
+  width: 28.2842712474px;
+  translate: 0 -2px;
+}
+.hamburger:has(input:checked)::after {
+  rotate: -45deg;
+  width: 28.2842712474px;
+  translate: 0 2px;
+}
+.hamburger input {
+  appearance: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  pointer-events: none;
+}
+.hamburger input:checked {
+  opacity: 0;
+  width: 0;
+}
+.sidebar {
+  transition: 200ms ease-in-out;
+  translate: 100%;
+  margin-top: 40px;
+  background-color: #1a1a1f;
+  max-width: 40vw;
+  height: ;
+}
+.hamburger:has(input:checked) + .sidebar {
+  translate: 0;
+}
