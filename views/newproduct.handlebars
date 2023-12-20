@@ -2,7 +2,7 @@
   <div>
     {{#if isLoggedIn}}
       {{#if isAdmin}}
-        <form action="/humans/new" method="post" class="login-form">
+        <form action="/products/new" method="post" class="login-form">
           <fieldset>
             <label for="proname">Product name:</label>
             <input
@@ -58,11 +58,11 @@
               type="text"
               id="prothumbnail"
               name="prothumbnail"
-              value="{{project.pthumbnail}}"
+              value="{{product.pthumbnail}}"
               placeholder="blue"
               required="required"
             />
-            <label for="proimg">Project image URL:</label>
+            <label for="proimg">product image URL:</label>
             <input
               class="login-input"
               type="text"
@@ -102,7 +102,7 @@
               required="required"
             />
           </fieldset>
-          <input type="submit" value="Add project" class="submitbutton" />
+          <input type="submit" value="Add product" class="submitbutton" />
         </form>
       {{else}}
         <p>You can't do this.</p>

@@ -4,10 +4,8 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const port = 8080;
 const app = express();
-const cookieParser = require("cookie-parser");
 const connectSqlite3 = require("connect-sqlite3");
 const bcrypt = require("bcrypt");
-const csurf = require("csurf");
 
 const sqlite3 = require("sqlite3");
 const db = new sqlite3.Database("project-jl.db");
@@ -25,7 +23,7 @@ app.use(
     store: new SQLiteStore({ db: "session-db.db" }),
     saveUninitialized: false,
     resave: false,
-    secret: "Password",
+    secret: "superhardpassword3457234327@??!!!}}}}}}",
   })
 );
 
@@ -73,7 +71,7 @@ app.get("/about", function (req, res) {
         isLoggedIn: req.session.isLoggedIn,
         name: req.session.name,
         isAdmin: req.session.isAdmin,
-        title: "Humans",
+        title: "products",
         userId: req.session.userId,
       };
       console.log("session: ", req.session);
@@ -131,7 +129,7 @@ app.get("/about/:id", (req, res) => {
         const model = {
           hasDatabaseError: true,
           theError: error,
-          events: {},
+          events: [],
           isAdmin: req.session.isAdmin,
           isLoggedIn: req.session.isLoggedIn,
           name: req.session.name,
@@ -251,37 +249,37 @@ app.get("/about/delete/:id", (req, res) => {
   }
 });
 
-app.get("/humans", function (req, res) {
-  db.all("SELECT * FROM projects", function (error, theProjects) {
+app.get("/products", function (req, res) {
+  db.all("SELECT * FROM products", function (error, theProducts) {
     if (error) {
       const model = {
         hasDatabaseError: true,
         theError: error,
-        projects: [],
+        products: [],
         isLoggedIn: req.session.isLoggedIn,
         name: req.session.name,
         isAdmin: req.session.isAdmin,
-        title: "humans",
+        title: "products",
         userId: req.session.userId,
       };
-      res.render("humans.handlebars", model);
+      res.render("products.handlebars", model);
     } else {
       const model = {
         hasDatabaseError: false,
         theError: "",
-        projects: theProjects,
+        products: theProducts,
         isLoggedIn: req.session.isLoggedIn,
         name: req.session.name,
         isAdmin: req.session.isAdmin,
-        title: "Humans",
+        title: "products",
         userId: req.session.userId,
       };
       console.log("session: ", req.session);
-      res.render("humans.handlebars", model);
+      res.render("products.handlebars", model);
     }
   });
 });
-app.get("/humans/new", (req, res) => {
+app.get("/products/new", (req, res) => {
   if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
     const model = {
       isLoggedIn: req.session.isLoggedIn,
@@ -296,7 +294,7 @@ app.get("/humans/new", (req, res) => {
   }
 });
 
-app.post("/humans/new", (req, res) => {
+app.post("/products/new", (req, res) => {
   const newp = [
     req.body.proname,
     req.body.proyear,
@@ -310,57 +308,48 @@ app.post("/humans/new", (req, res) => {
   ];
   if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
     db.run(
-      "INSERT INTO projects(pname, pyear, pdesc, ptype, pimgURL, pcolor, palcohol, pvolume, pthumbnail) VALUES (?,?,?,?,?,?,?,?,?)",
+      "INSERT INTO products(pname, pyear, pdesc, ptype, pimgURL, pcolor, palcohol, pvolume, pthumbnail) VALUES (?,?,?,?,?,?,?,?,?)",
       newp,
       (error) => {
         if (error) {
           console.log("error", error);
         } else {
-          console.log("line was added into project table!");
+          console.log("line was added into products table!");
         }
       }
     );
-    res.redirect("/humans");
+    res.redirect("/products");
   } else {
-    res.redirect("/humans");
+    res.redirect("/products");
   }
 });
-app.get("/humans/:id", (req, res) => {
+app.get("/products/:id", (req, res) => {
   const id = req.params.id;
 
   db.get(
-    "SELECT * FROM projects WHERE pid = ?",
+    "SELECT * FROM products WHERE pid = ?",
     [id],
-    function (error, foundProject) {
+    function (error, foundProduct) {
       if (error) {
-        // Handle error
+        console.log("error", error);
       } else {
         db.all(
           "SELECT reviews.*, users.uun FROM reviews LEFT JOIN users ON reviews.uid = users.uid WHERE reviews.pid = ?",
           [id],
           function (error, foundReviews) {
             if (error) {
-              // Handle error
             } else {
-              // Calculate average rating
-              const totalRating = foundReviews.reduce(
-                (sum, review) => sum + review.rating,
-                0
-              );
-              const averageRating = totalRating / foundReviews.length;
-
               const model = {
                 hasDatabaseError: false,
                 theError: "",
-                project: foundProject,
+                product: foundProduct,
                 reviews: foundReviews,
-                averageRating: averageRating.toFixed(2), // Rounded to 2 decimal places
                 isAdmin: req.session.isAdmin,
                 isLoggedIn: req.session.isLoggedIn,
                 userId: req.session.userId,
                 title: id,
               };
-              res.render("human.handlebars", model);
+              res.render("product.handlebars", model);
             }
           }
         );
@@ -368,94 +357,97 @@ app.get("/humans/:id", (req, res) => {
     }
   );
 });
-app.post("/humans/:id/reviews", (req, res) => {
-  const projectId = req.params.id;
+app.post("/products/:id/reviews", (req, res) => {
+  const productId = req.params.id;
   const { reviewText, rating } = req.body;
   const userId = req.session.userId;
   const userName = req.session.name;
-
-  // Insert the review into the database
-  db.run(
-    "INSERT INTO reviews (uid, pid, review, rating, uname) VALUES (?, ?, ?, ?, ?)",
-    [userId, projectId, reviewText, rating, userName],
-    (error) => {
-      if (error) {
-        console.error("Error inserting review into the database:", error);
-        res.status(500).send("Error submitting review.");
-      } else {
-        // Redirect the user back to the project page after submitting the review
-        res.redirect(`/humans/${projectId}`);
-        console.log(userName);
+  if (req.session.isLoggedIn === true) {
+    db.run(
+      "INSERT INTO reviews (uid, pid, review, rating, uname) VALUES (?, ?, ?, ?, ?)",
+      [userId, productId, reviewText, rating, userName],
+      (error) => {
+        if (error) {
+          console.error("Error inserting review into the database:", error);
+          res.status(500).send("Error submitting review.");
+        } else {
+          res.redirect(`/products/${productId}`);
+          console.log(userName);
+        }
       }
-    }
-  );
+    );
+  }
 });
-app.get("/humans/update/:id", (req, res) => {
+app.get("/products/update/:id", (req, res) => {
   const id = req.params.id;
-  db.get(
-    "SELECT * FROM projects where pid =?",
-    [id],
-    function (error, theProjects) {
-      if (error) {
-        const model = {
-          hasDatabaseError: true,
-          theError: error,
-          projects: {},
-          isAdmin: req.session.isAdmin,
-          name: req.session.name,
-          isLoggedIn: req.session.isLoggedIn,
-        };
-        console.log("error", error);
-        res.render("editproduct.handlebars", model);
-      } else {
-        const model = {
-          hasDatabaseError: false,
-          theError: "",
-          project: theProjects,
-          isAdmin: req.session.isAdmin,
-          name: req.session.name,
-          isLoggedIn: req.session.isLoggedIn,
-          userId: req.session.userId,
-          helpers: {
-            theType1(value) {
-              return value == "Ale";
+  if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
+    db.get(
+      "SELECT * FROM products where pid =?",
+      [id],
+      function (error, theProduct) {
+        if (error) {
+          const model = {
+            hasDatabaseError: true,
+            theError: error,
+            product: [],
+            isAdmin: req.session.isAdmin,
+            name: req.session.name,
+            isLoggedIn: req.session.isLoggedIn,
+          };
+          console.log("error", error);
+          res.render("editproduct.handlebars", model);
+        } else {
+          const model = {
+            hasDatabaseError: false,
+            theError: "",
+            products: theProduct,
+            isAdmin: req.session.isAdmin,
+            name: req.session.name,
+            isLoggedIn: req.session.isLoggedIn,
+            userId: req.session.userId,
+            helpers: {
+              theType1(value) {
+                return value == "Ale";
+              },
+              theType2(value) {
+                return value == "Lager";
+              },
+              theType3(value) {
+                return value == "Pilsner";
+              },
+              theType4(value) {
+                return value == "Porter";
+              },
+              theType5(value) {
+                return value == "IPA";
+              },
+              theType6(value) {
+                return value == "APA";
+              },
+              theType7(value) {
+                return value == "Stout";
+              },
+              theType8(value) {
+                return value == "Weizenbock";
+              },
+              theType9(value) {
+                return value == "bitter";
+              },
+              theType10(value) {
+                return value == "Other";
+              },
             },
-            theType2(value) {
-              return value == "Lager";
-            },
-            theType3(value) {
-              return value == "Pilsner";
-            },
-            theType4(value) {
-              return value == "Porter";
-            },
-            theType5(value) {
-              return value == "IPA";
-            },
-            theType6(value) {
-              return value == "APA";
-            },
-            theType7(value) {
-              return value == "Stout";
-            },
-            theType8(value) {
-              return value == "Weizenbock";
-            },
-            theType9(value) {
-              return value == "bitter";
-            },
-            theType10(value) {
-              return value == "Other";
-            },
-          },
-        };
-        res.render("editproduct.handlebars", model);
+          };
+          res.render("editproduct.handlebars", model);
+        }
       }
-    }
-  );
+    );
+  } else {
+    res.render("404.handlebars");
+  }
 });
 
-app.post("/humans/update/:id", (req, res) => {
+app.post("/products/update/:id", (req, res) => {
   const id = req.params.id;
   const newp = [
     req.body.proname,
@@ -471,7 +463,7 @@ app.post("/humans/update/:id", (req, res) => {
   ];
   if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
     db.run(
-      "UPDATE projects SET pname=?, pyear=?, pdesc=?, ptype=?, pimgURL=?, pcolor=?, palcohol=?, pvolume=?, pthumbnail=? WHERE pid=?",
+      "UPDATE products SET pname=?, pyear=?, pdesc=?, ptype=?, pimgURL=?, pcolor=?, palcohol=?, pvolume=?, pthumbnail=? WHERE pid=?",
       newp,
       (error) => {
         if (error) {
@@ -479,7 +471,7 @@ app.post("/humans/update/:id", (req, res) => {
         } else {
           console.log("updated");
         }
-        res.redirect("/humans");
+        res.redirect("/products");
       }
     );
   } else {
@@ -487,18 +479,18 @@ app.post("/humans/update/:id", (req, res) => {
   }
 });
 
-app.get("/humans/delete/:id", (req, res) => {
+app.get("/products/delete/:id", (req, res) => {
   const id = req.params.id;
   if (req.session.isLoggedIn === true && req.session.isAdmin === true) {
     db.run(
-      "DELETE FROM projects where pid =?",
+      "DELETE FROM products where pid =?",
       [id],
-      function (error, theProjects) {
+      function (error, theProduct) {
         if (error) {
           const model = {
             hasDatabaseError: true,
             theError: error,
-            projects: theProjects,
+            product: theProduct,
             isAdmin: req.session.isAdmin,
             name: req.session.name,
             isLoggedIn: req.session.isLoggedIn,
@@ -510,14 +502,14 @@ app.get("/humans/delete/:id", (req, res) => {
           const model = {
             hasDatabaseError: false,
             theError: "",
-            project: theProjects,
+            product: theProduct,
             isAdmin: req.session.isAdmin,
             name: req.session.name,
             isLoggedIn: req.session.isLoggedIn,
             userId: req.session.userId,
           };
           res.render("home.handlebars", model);
-          res.redirect("/humans");
+          res.redirect("/products");
         }
       }
     );
@@ -613,61 +605,95 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 db.run(
-  "CREATE TABLE projects (pid INTEGER PRIMARY KEY AUTOINCREMENT, pname TEXT NOT NULL, pyear INTEGER NOT NULL, pdesc TEXT NOT NULL, ptype TEXT NOT NULL, pimgURL TEXT NOT NULL, pcolor TEXT NOT NULL, palcohol INTEGER NOT NULL, pvolume INTEGER NOT NULL, pthumbnail TEXT NOT NULL)",
+  "CREATE TABLE products (pid INTEGER PRIMARY KEY AUTOINCREMENT, pname TEXT NOT NULL, pyear INTEGER NOT NULL, pdesc TEXT NOT NULL, ptype TEXT NOT NULL, pimgURL TEXT NOT NULL, pcolor TEXT NOT NULL, palcohol INTEGER NOT NULL, pvolume INTEGER NOT NULL, pthumbnail TEXT NOT NULL)",
   (error) => {
     if (error) {
-      // tests error: display error
       console.log("ERROR: ", error);
     } else {
-      // tests error: no error, the table has been created
-      console.log("---> Table projects created!");
-      const projects = [
+      console.log("---> Table products created!");
+      const products = [
         {
           id: "1",
-          name: "Counting people with a camera",
-          type: "Ale",
-          desc: " Pistonhead Kustom Lager is Kustom brewed with a double-clutch of Münchener and Pilsner malt injected with Spalter Select, Magnum and Perle hops that will leave a hint of bitterness on your lips, but never in your heart.",
+          name: "Midnight Stout",
+          type: "Stout",
+          desc: "A velvety dark stout that embraces the essence of midnight. Rich roasted malt flavors mingle with hints of chocolate and coffee, delivering a smooth and indulgent experience for those who appreciate the depth of flavor.",
           year: 2022,
           url: "/img/Product-img.svg",
-          color: "blue",
-          alcohol: 5.0,
+          color: "Dark Brown",
+          alcohol: 4.2,
           volume: 33,
           thumbnail: "/img/Product-img.svg",
         },
         {
           id: "2",
-          name: "Visualisation of 3D medical images",
-          type: "Lager",
-          desc: " Pistonhead Kustom Lager is Kustom brewed with a double-clutch of Münchener and Pilsner malt injected with Spalter Select, Magnum and Perle hops that will leave a hint of bitterness on your lips, but never in your heart.",
-          year: 2012,
+          name: "Citrus Zest IPA",
+          type: "IPA",
+          desc: "Bursting with citrusy goodness, this IPA is a zesty delight for the senses. It's a bold and hoppy brew infused with the essence of fresh citrus fruits. The vibrant aroma and sharp, citrus flavors make it a favorite among IPA enthusiasts.",
+          year: 2022,
           url: "/img/Product-img.svg",
-          color: "blue",
+          color: "piss",
+          alcohol: 6.9,
+          volume: 33,
+          thumbnail: "/img/Product-img.svg",
+        },
+        {
+          id: "3",
+          name: "Mystic Oak Amber",
+          type: "Lager",
+          desc: "A beer steeped in mystique, Mystic Oak Amber combines the richness of amber ale with the complexity of oak aging. Subtle vanilla and oak notes complement the caramel malts, creating a beer that is both intriguing and satisfying.",
+          year: 2023,
+          url: "/img/Product-img.svg",
+          color: "amber",
+          alcohol: 5.2,
+          volume: 33,
+          thumbnail: "/img/Product-img.svg",
+        },
+        {
+          id: "4",
+          name: "Crimson Sunset Lager",
+          type: "Lager",
+          desc: "Crimson Sunset Lager paints the sky with its deep, reddish hues. This lager offers a harmonious blend of caramel sweetness and a touch of roasted malt bitterness. As the sun sets, savor the smooth finish and the lingering warmth of this exceptional brew.",
+          year: 2018,
+          url: "/img/Product-img.svg",
+          color: "red",
+          alcohol: 4.8,
+          volume: 33,
+          thumbnail: "/img/Product-img.svg",
+        },
+        {
+          id: "5",
+          name: "Velvet Porter",
+          type: "Porter",
+          desc: "Velvet Porter is a luxurious beer with a smooth, velvety texture. Its dark, mahogany color hints at the decadent flavors within. Expect a delightful blend of chocolate, toffee, and roasted coffee notes, making every sip a sumptuous experience.",
+          year: 2019,
+          url: "/img/Product-img.svg",
+          color: "Dark Amber",
           alcohol: 5.0,
           volume: 33,
           thumbnail: "/img/Product-img.svg",
         },
       ];
-      // inserts projects
-      projects.forEach((oneProject) => {
+
+      products.forEach((oneProduct) => {
         db.run(
-          "INSERT INTO projects (pid, pname, pyear, pdesc, ptype, pimgURL, pcolor, palcohol, pvolume, pthumbnail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO products (pid, pname, pyear, pdesc, ptype, pimgURL, pcolor, palcohol, pvolume, pthumbnail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
           [
-            oneProject.id,
-            oneProject.name,
-            oneProject.year,
-            oneProject.desc,
-            oneProject.type,
-            oneProject.url,
-            oneProject.color,
-            oneProject.alcohol,
-            oneProject.volume,
-            oneProject.thumbnail,
+            oneProduct.id,
+            oneProduct.name,
+            oneProduct.year,
+            oneProduct.desc,
+            oneProduct.type,
+            oneProduct.url,
+            oneProduct.color,
+            oneProduct.alcohol,
+            oneProduct.volume,
+            oneProduct.thumbnail,
           ],
           (error) => {
             if (error) {
               console.log("ERROR: ", error);
             } else {
-              console.log("Line added into the projects table!");
+              console.log("Line added into the products table!");
             }
           }
         );
@@ -677,7 +703,7 @@ db.run(
 );
 
 db.run(
-  "CREATE TABLE users (uid INTEGER PRIMARY KEY, uname TEXT NOT NULL, urole TEXT NOT NULL, uun TEXT NOT NULL, upw TEXT NOT NULL)",
+  "CREATE TABLE users (uid INTEGER PRIMARY KEY AUTOINCREMENT, uname TEXT NOT NULL, urole TEXT NOT NULL, uun TEXT NOT NULL, upw TEXT NOT NULL)",
   (error) => {
     if (error) {
       // tests error: display error
@@ -693,8 +719,35 @@ db.run(
           un: "ebrin",
           pw: "123",
         },
+        {
+          id: "2",
+          name: "ronie.coleman",
+          role: "customer",
+          un: "ronie.coleman",
+          pw: "1234",
+        },
+        {
+          id: "3",
+          name: "chad",
+          role: "customer",
+          un: "chad",
+          pw: "12345",
+        },
+        {
+          id: "4",
+          name: "carl",
+          role: "customer",
+          un: "carl",
+          pw: "123456",
+        },
+        {
+          id: "5",
+          name: "lisa",
+          role: "customer",
+          un: "lisa",
+          pw: "1234567",
+        },
       ];
-      // inserts projects
       users.forEach((oneUser) => {
         const hashedPassword = bcrypt.hashSync(oneUser.pw, 10);
         db.run(
@@ -714,7 +767,7 @@ db.run(
 );
 
 db.run(
-  "CREATE TABLE reviews (rid INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER, pid INTEGER, review TEXT NOT NULL, rating INTEGER NOT NULL, uname TEXT NOT NULL,  FOREIGN KEY(uid) REFERENCES users(uid), FOREIGN KEY(pid) REFERENCES projects(pid), FOREIGN KEY(uname) REFERENCES users(uname))",
+  "CREATE TABLE reviews (rid INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER, pid INTEGER, review TEXT NOT NULL, rating INTEGER NOT NULL, uname TEXT NOT NULL,  FOREIGN KEY(uid) REFERENCES users(uid), FOREIGN KEY(pid) REFERENCES products(pid), FOREIGN KEY(uname) REFERENCES users(uname))",
   (error) => {
     if (error) {
       console.log("ERROR: ", error);
@@ -732,8 +785,29 @@ db.run(
           uid: 1,
           pid: 2,
           review: "Woow tase like beer",
-          rating: 1,
+          rating: 3,
           username: "ebrin",
+        },
+        {
+          uid: 3,
+          pid: 4,
+          review: "Woow tase like beer",
+          rating: 4.5,
+          username: "chad",
+        },
+        {
+          uid: 3,
+          pid: 1,
+          review: "Woow tase like beer",
+          rating: 2,
+          username: "chad",
+        },
+        {
+          uid: 2,
+          pid: 1,
+          review: "Woow tase like beer",
+          rating: 1,
+          username: "ronie.coleman",
         },
       ];
       // inserts reviews
@@ -771,11 +845,47 @@ db.run(
         {
           eid: 1,
           date: "2023-10-15",
-          location: "jönköping",
+          location: "Jönköping",
           description:
             "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
-          thumbnail: "/img/chokladboll.jpg",
+          thumbnail: "/img/bence-boros-8T5UAV6KkZA-unsplash.jpg",
           name: "Drinking beer event",
+        },
+        {
+          eid: 2,
+          date: "2023-11-16",
+          location: "Stockholm",
+          description:
+            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
+          thumbnail: "/img/adam-gavlak-lqWf-yoQztI-unsplash.jpg",
+          name: "Drinking beer event in Stockholm",
+        },
+        {
+          eid: 3,
+          date: "2023-12-10",
+          location: "Gothenburg",
+          description:
+            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
+          thumbnail: "/img/edvin-johansson-xySWKrVlcWQ-unsplash.jpg",
+          name: "Drinking beer event in Gothenburg",
+        },
+        {
+          eid: 4,
+          date: "2024-02-27",
+          location: "Amsterdam",
+          description:
+            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
+          thumbnail: "/img/max-van-den-oetelaar--e4vLFZV9QM-unsplash.jpg",
+          name: "Drinking beer event in Amsterdam",
+        },
+        {
+          eid: 5,
+          date: "2024-02-15",
+          location: "Paris",
+          description:
+            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
+          thumbnail: "/img/alexander-kagan-t9Td0zfDTwI-unsplash.jpg",
+          name: "Drinking beer event in Paris",
         },
       ];
       events.forEach((oneEvent) => {

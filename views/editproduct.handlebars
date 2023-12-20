@@ -2,14 +2,14 @@
   <div>
     {{#if isLoggedIn}}
       {{#if isAdmin}}
-        <form action="/humans/update/{{project.pid}}" method="post" class="login-form">
+        <form action="/products/update/{{product.pid}}" method="post" class="login-form">
           <fieldset>
             <label for="proname">Product name:</label>
             <input
               type="text"
               name="proname"
               id="proname"
-              value="{{project.pname}}"
+              value="{{product.pname}}"
               required="required"
                class="login-input"
             />
@@ -20,7 +20,7 @@
               name="proyear"
               id="proyear"
               placeholder="6969"
-              value="{{project.pyear}}"
+              value="{{product.pyear}}"
               required="required"
                class="login-input"
             />
@@ -33,20 +33,20 @@
               rows="10"
               required="required"
                class="login-input"
-            >{{project.pdesc}}</textarea>
+            >{{product.pdesc}}</textarea>
             <br />
             <label for="protype">Product type:</label>
             <select name="protype" id="protype" required="required"  class="login-input">
-                <option value="Ale"{{#if (theType1 project.ptype)}} selected="selected"{{/if}}>Ale</option>
-                <option value="Lager"{{#if (theType2 project.ptype)}} selected="selected"{{/if}}>Lager</option>
-                <option value="Pilsner"{{#if (theType3 project.ptype)}} selected="selected"{{/if}}>Pilsner</option>
-                <option value="Porter"{{#if (theType4 project.ptype)}} selected="selected"{{/if}}>Porter</option>
-                <option value="IPA"{{#if (theType5 project.ptype)}} selected="selected"{{/if}}>IPA</option>
-                <option value="APA"{{#if (theType6 project.ptype)}} selected="selected"{{/if}}>APA</option>
-                <option value="Stout"{{#if (theType7 project.ptype)}} selected="selected"{{/if}}>Stout</option>
-                <option value="Weizenbock"{{#if (theType8 project.ptype)}} selected="selected"{{/if}}>Weizenbock</option>
-                <option value="Bitter"{{#if (theType9 project.ptype)}} selected="selected"{{/if}}>Bitter</option>
-                <option value="Other"{{#if (theType10 project.ptype)}} selected="selected"{{/if}}>Other</option>
+                <option value="Ale"{{#if (theType1 product.ptype)}} selected="selected"{{/if}}>Ale</option>
+                <option value="Lager"{{#if (theType2 product.ptype)}} selected="selected"{{/if}}>Lager</option>
+                <option value="Pilsner"{{#if (theType3 product.ptype)}} selected="selected"{{/if}}>Pilsner</option>
+                <option value="Porter"{{#if (theType4 product.ptype)}} selected="selected"{{/if}}>Porter</option>
+                <option value="IPA"{{#if (theType5 product.ptype)}} selected="selected"{{/if}}>IPA</option>
+                <option value="APA"{{#if (theType6 product.ptype)}} selected="selected"{{/if}}>APA</option>
+                <option value="Stout"{{#if (theType7 product.ptype)}} selected="selected"{{/if}}>Stout</option>
+                <option value="Weizenbock"{{#if (theType8 product.ptype)}} selected="selected"{{/if}}>Weizenbock</option>
+                <option value="Bitter"{{#if (theType9 product.ptype)}} selected="selected"{{/if}}>Bitter</option>
+                <option value="Other"{{#if (theType10 product.ptype)}} selected="selected"{{/if}}>Other</option>
              
 
             </select>
@@ -57,18 +57,18 @@
               type="text"
               id="prothumbnail"
               name="prothumbnail"
-              value="{{project.pthumbnail}}"
+              value="{{product.pthumbnail}}"
               placeholder="blue"
               required="required"
               
             />
-            <label for="proimg">Project image URL:</label>
+            <label for="proimg">product image URL:</label>
             <input
               type="text"
               name="proimg"
               id="proimg"
               placeholder="/img/"
-              value="{{project.pimgURL}}"
+              value="{{product.pimgURL}}"
               required="required"
                class="login-input"
             />
@@ -79,7 +79,7 @@
               type="text"
               id="procolor"
               name="procolor"
-              value="{{project.pcolor}}"
+              value="{{product.pcolor}}"
               placeholder="blue"
               required="required"
               
@@ -92,7 +92,7 @@
               id="proalcohol"
               placeholder="5.0"
               required="required"
-              value="{{project.palcohol}}"
+              value="{{product.palcohol}}"
               step=".01"
             />
             <label for="provolume">volume:</label>
@@ -103,7 +103,7 @@
               id="provolume"
               placeholder="33"
               required="required"
-              value="{{project.pvolume}}"
+              value="{{product.pvolume}}"
             />
           </fieldset>
           <input type="submit" value="Submit changes" class="submitbutton"/>
