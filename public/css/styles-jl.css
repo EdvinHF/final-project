@@ -3,8 +3,10 @@ body {
   background-size: 180% 180%;
   animation: gradient-animation 15s ease infinite;
   width: 100vw;
+
   overflow-x: hidden;
 }
+
 textarea {
   resize: vertical;
 }
@@ -18,12 +20,25 @@ summary {
   box-sizing: content-box;
   color: rgb(255, 255, 255);
 }
+a:active,
 a:focus {
   outline: none;
+  border: none;
+  box-shadow: none;
+}
+a:visited {
+  color: #ffffff;
 }
 a {
   color: black;
   text-decoration: none;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 a:hover {
   color: rgb(136, 136, 136);
@@ -268,7 +283,6 @@ a {
   animation-name: changecolor;
   animation-fill-mode: forwards;
   cursor: pointer;
-  text-align: end;
 }
 
 @keyframes changecolor {
@@ -739,6 +753,14 @@ p {
   .add-event-container {
     width: 95vw;
     height: 400px;
+  }
+
+  .navbar {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .hero-headline {
+    font-size: 40px;
   }
 }
 

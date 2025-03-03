@@ -777,7 +777,7 @@ db.run(
         {
           uid: 1,
           pid: 1,
-          review: "Woow tase like shit",
+          review: "Woow tase like someting",
           rating: 5,
           username: "ebrin",
         },
@@ -848,7 +848,7 @@ db.run(
           location: "Jönköping",
           description:
             "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
-          thumbnail: "/img/bence-boros-8T5UAV6KkZA-unsplash.jpg",
+          thumbnail: "/img/melvin-sWPtkG2uNVU-unsplash.jpg",
           name: "Drinking beer event",
         },
         {
@@ -857,7 +857,7 @@ db.run(
           location: "Stockholm",
           description:
             "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
-          thumbnail: "/img/adam-gavlak-lqWf-yoQztI-unsplash.jpg",
+          thumbnail: "/img/jon-flobrant-jxfe3orC4G8-unsplash.jpg",
           name: "Drinking beer event in Stockholm",
         },
         {
@@ -866,7 +866,7 @@ db.run(
           location: "Gothenburg",
           description:
             "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
-          thumbnail: "/img/edvin-johansson-xySWKrVlcWQ-unsplash.jpg",
+          thumbnail: "/img/aron-fjell-_tEuLRHM-os-unsplash.jpg",
           name: "Drinking beer event in Gothenburg",
         },
         {
@@ -875,7 +875,7 @@ db.run(
           location: "Amsterdam",
           description:
             "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
-          thumbnail: "/img/max-van-den-oetelaar--e4vLFZV9QM-unsplash.jpg",
+          thumbnail: "/img/piotr-chrobot-M4EcjtmE01k-unsplash.jpg",
           name: "Drinking beer event in Amsterdam",
         },
         {
@@ -884,7 +884,7 @@ db.run(
           location: "Paris",
           description:
             "Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam maxime excepturi voluptatibus nam repellendus ipsum et. Voluptates, cum cupiditate. Accusantium modi nesciunt molestiae! Eveniet, deserunt optio omnis nisi adipisci reprehenderit!",
-          thumbnail: "/img/alexander-kagan-t9Td0zfDTwI-unsplash.jpg",
+          thumbnail: "/img/leonard-cotte-R5scocnOOdM-unsplash.jpg",
           name: "Drinking beer event in Paris",
         },
       ];
